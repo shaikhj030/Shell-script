@@ -207,3 +207,105 @@ Related History Shortcuts
 !string: Re-runs the most recent command starting with "string" (e.g., !git).
 !?string?: Re-runs the most recent command containing "string" anywhere in the line.
 
+what is cp --parents option does ?
+The cp --parents option is used to preserve the directory structure of a source file when copying it to a destination. It automatically creates any missing intermediate parent directories in the target location to match the source's path.
+How It Works
+When you use this option, cp takes the full path you specified for the source and appends it to the target directory. 
+
+Standard cp: Copies only the file itself into the destination.
+cp --parents: Re-creates the path to that file inside the destination. 
+
+Comparison Example
+Imagine you have a file at dir1/dir2/file.txt and you want to copy it to a backup folder named backup/.
+
+Command	                                     Resulting Path
+cp dir1/dir2/file.txt backup/	               backup/file.txt
+cp --parents dir1/dir2/file.txt backup/	     backup/dir1/dir2/file.txt
+
+Key Details
+Automatic Creation: You don't need to manually run mkdir -p first; cp --parents creates the backup/dir1/dir2/ folders for you if they don't exist.
+Target Must Be a Directory: The final argument must be an existing directory.
+Availability: This is a GNU extension. It is standard on Linux (GNU Coreutils) but is typically not available on default macOS (BSD) unless you install GNU Coreutils via Homebrew.
+Attributes: While it creates the directories, it may not automatically preserve the original permissions/modes of those parent directories unless combined with options like -p or --preserve.
+
+how can you store a command output to variable
+1. Bash / Zsh / Linux Shells
+Use command substitution with the $(...) syntax. 
+
+Syntax: variable=$(command)
+Example:
+bash
+current_dir=$(pwd)
+echo "You are in: $current_dir"
+
+username=`id -a $1`
+echo "below is the USer ID of mentioned user $1"
+echo $username
+the backstash (`) can be used to hold a command output in a file.
+
+how to echo a command output without a trailing newline
+To echo a command's output without a trailing newline, the method depends on your shell environment. 
+1. Bash, Zsh, and Linux Shells 
+The most common way is using the -n flag with echo, but for better portability across different systems (like macOS vs. Linux), printf is recommended. 
+
+Using echo:
+echo -n $(hostname)
+
+The -n flag specifically tells echo not to append a newline.
+Using printf (Recommended):
+printf "%s" $(hostname)
+
+printf does not add a newline by default unless you explicitly include \n in the format string.
+
+can anything else other than /bin/bash be used for SHEBANG in bash?
+#! (aka SHEBANG) defines the path of interpreter that OS need to understand to parse the script
+
+Usually we see /bin/bash to find the bash , but we can use other absolute/relative paths to find the bash.
+
+/bin/bash    
+/bin/sh
+/usr/bin/env bash
+
+Can we break a specfic loop in multiple loop scripts
+
+In Bash, the break command accepts an optional numeric argument representing the number of nested levels to exit. 
+
+break: Exits the current (innermost) loop.
+break 2: Exits the current loop and the one immediately above it.
+break 3: Exits three levels of nesting.
+
+cat break.sh
+#!/bin/bash
+
+# Outer Loop
+for i in {1..3}; do
+    echo "Outer loop: $i"
+
+    # Inner Loop
+    for j in {1..5}; do
+        if [[ $j -eq 3 ]]; then
+            echo "  Breaking out of BOTH loops at inner=$j"
+            continue   # <--- Breaks out of the inner AND outer loop
+        fi
+        echo "  Inner loop: $j"
+    done
+        if [[ $i -eq 2 ]]; then
+                echo "breaking out of both loops at outer=$i"
+                break 2
+fi
+done
+
+echo "Finished!"
+output 
+ sh break.sh
+Outer loop: 1
+  Inner loop: 1
+  Inner loop: 2
+  Breaking out of BOTH loops at inner=3
+Outer loop: 2
+  Inner loop: 1
+  Inner loop: 2
+  Breaking out of BOTH loops at inner=3
+breaking out of both loops at outer=2
+Finished!
+
